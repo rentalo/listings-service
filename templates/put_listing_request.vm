@@ -1,0 +1,97 @@
+## Input values
+#set($locationId = $util.escapeJavaScript($input.path('$.geohash')))
+#set($listingId = $util.escapeJavaScript($input.path('$.id')))
+#set($category = $util.escapeJavaScript($input.path('$.category')))
+#set($rent = $util.escapeJavaScript($input.path('$.rent')))
+#set($address = $util.escapeJavaScript($input.path('$.address')))
+#set($latitude = $util.escapeJavaScript($input.path('$.position.latitude')))
+#set($longitude = $util.escapeJavaScript($input.path('$.position.longitude')))
+#set($width = $util.escapeJavaScript($input.path('$.width')))
+#set($height = $util.escapeJavaScript($input.path('$.height')))
+#set($depth = $util.escapeJavaScript($input.path('$.depth')))
+#set($isNegotiable = $util.escapeJavaScript($input.path('$.isNegotiable')))
+#set($isShared = $util.escapeJavaScript($input.path('$.isShared')))
+#set($owner = $context.authorizer.claims.sub)
+#set($phone = $util.escapeJavaScript($input.path('$.phone')))
+#set($email = $util.escapeJavaScript($input.path('$.email')))
+#set($photos = $input.path('$.photos'))
+
+## Set default values
+#set($phone = "#if($phone.empty)$context.authorizer.claims.phone_number#{else}$phone#end")
+#set($email = "#if($email.empty)$context.authorizer.claims.email#{else}$email#end")
+
+{
+    "TableName": "ListingsTable",
+    "Item": {
+        "locationId": {
+            "S": "$locationId"
+        },
+        "listingId": {
+            "S": "$listingId"
+        },
+        "category": {
+            "S": "$category"
+        },
+        "rent": {
+            "N": "$rent"
+        },
+        "address": {
+            "S": "$address"
+        },
+        "position": {
+            "M": {
+                "latitude": {
+                    "N": "$latitude"
+                },
+                "longitude": {
+                    "N": "$longitude"
+                }
+            }
+        },
+        "photos": {
+            "SS": [
+                #foreach($p in $photos)
+                    "$p"#if($foreach.hasNext),#end
+                #end
+            ]
+        },
+        "width": {
+            "N": "$width"
+        },
+        "height": {
+            "N": "$height"
+        },
+        "depth": {
+            "N": "$depth"
+        },
+        "isNegotiable": {
+            "BOOL": $isNegotiable
+        },
+        "isShared": {
+            "BOOL": $isShared
+        },
+        "owner": {
+            "S": "$owner"
+        },
+        "phone": {
+            "S": "$phone"
+        },
+        "email": {
+            "S": "$email"
+        }
+    },
+
+    ## Insert only if new and update only if user is owner
+    "ConditionExpression": "attribute_not_exists(listingId) or #owner = :owner",
+
+    "ExpressionAttributeValues": {
+        ":owner": {
+            "S": "$owner"
+        }
+    },
+
+    ## This mapping is required since 'owner' is a reserved keyword
+    "ExpressionAttributeNames": {
+        "#owner": "owner"
+    }
+}

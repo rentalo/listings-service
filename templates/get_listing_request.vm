@@ -1,0 +1,22 @@
+## Input values
+#set($locationId = $input.params('geohash'))
+#set($listingId = $input.params('id'))
+
+## Escape values
+#set($locationId = $util.escapeJavaScript($locationId))
+#set($listingId = $util.escapeJavaScript($listingId))
+
+{
+
+    "TableName": "ListingsTable",
+
+    "Key": {
+        "locationId": {
+            "S": "$locationId"
+        },
+        "listingId": {
+            "S": "$listingId"
+        }
+    }
+
+}

@@ -1,0 +1,22 @@
+#set($root = $input.path('$'))
+#set($root = $root.Item)
+{
+    "listingId": "$root.listingId.S",
+    "locationId": "$root.locationId.S",
+    "category": "$root.category.S",
+    "rent": $root.rent.N,
+    "address": "$root.address.S",
+    "position": {
+        "latitude": $root.position.M.latitude.N,
+        "longitude": $root.position.M.longitude.N
+    },
+    "width": $root.width.N,
+    "height": $root.height.N,
+    "depth": $root.depth.N,
+    "isNegotiable": $root.isNegotiable.BOOL,
+    "isShared": $root.isShared.BOOL,
+    "photos": #if(!$root.photos)[]#{else}$root.photos.SS#end,
+    "email": "$root.email.S",
+    "phone": "$root.phone.S",
+    "owner": "$root.owner.S"
+}

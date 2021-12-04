@@ -1,0 +1,87 @@
+## Input values
+#set($locationId = $input.params('geohash'))
+#set($category = $input.params('category'))
+#set($maxRent = $input.params('max_rent'))
+#set($minWidth = $input.params('min_width'))
+#set($minHeight = $input.params('min_height'))
+#set($minDepth = $input.params('min_depth'))
+#set($isShared = $input.params('is_shared'))
+
+## Escape values
+#set($locationId = $util.escapeJavaScript($locationId))
+#set($category = $util.escapeJavaScript($category))
+#set($maxRent = $util.escapeJavaScript($maxRent))
+#set($minWidth = $util.escapeJavaScript($minWidth))
+#set($minHeight = $util.escapeJavaScript($minHeight))
+#set($minDepth = $util.escapeJavaScript($minDepth))
+#set($isShared = $util.escapeJavaScript($isShared))
+
+## Set default values
+#set($category = "#if($category.empty)BOX#{else}$category#end")
+#set($maxRent = "#if($maxRent.empty)9999#{else}$maxRent#end")
+
+## Search filters
+#set($categoryFilter = "category = :category")
+#set($maxRentFilter = "and rent <= :maxRent")
+#set($minWidthFilter = "#if(!$minWidth.empty)and width >= :minWidth#end")
+#set($minHeightFilter = "#if(!$minHeight.empty)and height >= :minHeight#end")
+#set($minDepthFilter = "#if(!$minDepth.empty)and #depth >= :minDepth#end")
+#set($isSharedFilter = "#if(!$isShared.empty)and isShared = :isShared#end")
+
+{
+
+    "TableName": "ListingsTable",
+    "IndexName": "ListingCategoryIndex",
+
+    "KeyConditionExpression": "$categoryFilter $maxRentFilter",
+
+    "FilterExpression": "locationId = :locationId $minWidthFilter $minHeightFilter $minDepthFilter $isSharedFilter",
+
+    "ExpressionAttributeValues": {
+
+        ":locationId": {
+            "S": "$locationId"
+        },
+        ":category": {
+            "S": "$category"
+        },
+        ":maxRent": {
+            "N": "$maxRent"
+        }
+
+        #if(!$minWidth.empty)
+        ,":minWidth": {
+            "N": "$minWidth"
+        }
+        #end
+
+        #if(!$minHeight.empty)
+        ,":minHeight": {
+            "N": "$minHeight"
+        }
+        #end
+
+        #if(!$minDepth.empty)
+        ,":minDepth": {
+            "N": "$minDepth"
+        }
+        #end
+
+        #if(!$isShared.empty)
+        ,":isShared": {
+            "BOOL": "$isShared"
+        }
+        #end
+
+    },
+
+    ## This mapping is required since 'depth' is a reserved keyword
+    #if(!$minDepth.empty)
+    "ExpressionAttributeNames": {
+        "#depth": "depth"
+    },
+    #end
+
+    "Limit": 1000
+
+}

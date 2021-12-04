@@ -1,0 +1,37 @@
+## Input values
+#set($locationId = $input.params('geohash'))
+#set($listingId = $input.params('id'))
+#set($owner = $context.authorizer.claims.sub)
+
+## Escape values
+#set($locationId = $util.escapeJavaScript($locationId))
+#set($listingId = $util.escapeJavaScript($listingId))
+
+{
+
+    "TableName": "ListingsTable",
+
+    "Key": {
+        "locationId": {
+            "S": "$locationId"
+        },
+        "listingId": {
+            "S": "$listingId"
+        }
+    },
+
+    ## Delete only if user is owner
+    "ConditionExpression": "#owner = :owner",
+
+    "ExpressionAttributeValues": {
+        ":owner": {
+            "S": "$owner"
+        }
+    },
+
+    ## This mapping is required since 'owner' is a reserved keyword
+    "ExpressionAttributeNames": {
+        "#owner": "owner"
+    }
+
+}

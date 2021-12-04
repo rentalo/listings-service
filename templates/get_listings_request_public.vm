@@ -1,0 +1,36 @@
+## Input values
+#set($locationId = $input.params('geohash'))
+
+## Escape values
+#set($locationId = $util.escapeJavaScript($locationId))
+
+## Search filters
+#set($categoryFilter = "category = :category")
+#set($maxRentFilter = "and rent <= :maxRent")
+
+{
+
+    "TableName": "ListingsTable",
+    "IndexName": "ListingCategoryIndex",
+
+    "KeyConditionExpression": "$categoryFilter $maxRentFilter",
+
+    "FilterExpression": "locationId = :locationId",
+
+    "ExpressionAttributeValues": {
+
+        ":locationId": {
+            "S": "$locationId"
+        },
+        ":category": {
+            "S": "BOX"
+        },
+        ":maxRent": {
+            "N": "9999"
+        }
+
+    },
+
+    "Limit": 10
+
+}
