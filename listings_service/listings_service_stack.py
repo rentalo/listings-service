@@ -115,6 +115,8 @@ class ListingsServiceStack(cdk.Stack):
                         "integration.request.querystring.min_height": "method.request.querystring.min_height",
                         "integration.request.querystring.min_depth": "method.request.querystring.min_depth",
                         "integration.request.querystring.is_shared": "method.request.querystring.is_shared",
+                        "integration.request.querystring.from_date": "method.request.querystring.from_date",
+                        "integration.request.querystring.to_date": "method.request.querystring.to_date"
                     },
                     request_templates={"application/json": request_template.read()},
                     integration_responses=[
@@ -381,6 +383,7 @@ class ListingsServiceStack(cdk.Stack):
                     ),
                     "position": apigateway.JsonSchema(
                         type=apigateway.JsonSchemaType.OBJECT,
+                        required=["latitude", "longitude"],
                         properties={
                             "latitude": apigateway.JsonSchema(
                                 type=apigateway.JsonSchemaType.NUMBER,
@@ -417,6 +420,24 @@ class ListingsServiceStack(cdk.Stack):
                     "phone": apigateway.JsonSchema(
                         type=apigateway.JsonSchemaType.STRING,
                         pattern="^\\+39[0-9]{10}$"                                                                      # Match only italian phone numbers
+                    ),
+                    "description": apigateway.JsonSchema(
+                        type=apigateway.JsonSchemaType.STRING,
+                        max_length=1000
+                    ),
+                    "availability": apigateway.JsonSchema(
+                        type=apigateway.JsonSchemaType.OBJECT,
+                        required=["from"],                                                                              # When upper limit is not defined then it's always available
+                        properties={
+                            "from": apigateway.JsonSchema(
+                                type=apigateway.JsonSchemaType.STRING,
+                                pattern="^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"                      # Match only ISO 8601 date-time strings
+                            ),
+                            "to": apigateway.JsonSchema(
+                                type=apigateway.JsonSchemaType.STRING,
+                                pattern="^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}Z$"                      # Match only ISO 8601 date-time strings
+                            )
+                        }
                     )
                 }
             )
@@ -435,6 +456,8 @@ class ListingsServiceStack(cdk.Stack):
                 "method.request.querystring.min_depth": False,
                 "method.request.querystring.max_price": False,
                 "method.request.querystring.is_shared": False,
+                "method.request.querystring.from_date": True,
+                "method.request.querystring.to_date": False
             },
             method_responses=[
                 apigateway.MethodResponse(status_code="200"),

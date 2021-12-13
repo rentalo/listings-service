@@ -44,6 +44,8 @@ Query parameters:
 - `min_depth`
 - `max_price`
 - `is_shared`
+- `from_date`
+- `to_date`
 
 #### Publish a listing
 
@@ -72,7 +74,12 @@ Sample body:
   "isNegotiable": false,
   "isShared": true,
   "photos": ["avMQpjqbGEzCCPuTZjTEJQ=="],
-  "phone": "+393211234567"
+  "phone": "+393211234567",
+  "description": "Esempio descrizione con dettagli particolari",
+  "availability": {
+    "from": "2018-01-01T00:00:00Z",
+    "to": "2021-01-01T00:00:00Z"
+  }
 
 }
 ```
@@ -104,7 +111,12 @@ Sample response:
   "photos": ["avMQpjqbGEzCCPuTZjTEJQ=="],
   "email": "sample@email.com", 
   "phone": "+393211234567",
-  "owner": "42e9b4da-f4c9-4f8f-93be-97fb7bec9bc5"
+  "owner": "42e9b4da-f4c9-4f8f-93be-97fb7bec9bc5",
+  "description": "Esempio descrizione con dettagli particolari",
+  "availability": {
+    "from": "2018-01-01T00:00:00Z",
+    "to": "2021-01-01T00:00:00Z"
+  }
 
 }
 ```

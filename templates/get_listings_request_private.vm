@@ -6,6 +6,8 @@
 #set($minHeight = $input.params('min_height'))
 #set($minDepth = $input.params('min_depth'))
 #set($isShared = $input.params('is_shared'))
+#set($fromDate = $input.params('from_date'))
+#set($toDate = $input.params('to_date'))
 
 ## Escape values
 #set($locationId = $util.escapeJavaScript($locationId))
@@ -15,10 +17,14 @@
 #set($minHeight = $util.escapeJavaScript($minHeight))
 #set($minDepth = $util.escapeJavaScript($minDepth))
 #set($isShared = $util.escapeJavaScript($isShared))
+#set($fromDate = $util.escapeJavaScript($fromDate))
+#set($toDate = $util.escapeJavaScript($toDate))
 
 ## Set default values
 #set($category = "#if($category.empty)BOX#{else}$category#end")
 #set($maxRent = "#if($maxRent.empty)9999#{else}$maxRent#end")
+#set($toDate = "#if($toDate.empty)9999-99-99#{else}$toDate#end")
+#set($fromDate = "#if($fromDate.empty)0000-00-00#{else}$fromDate#end")
 
 ## Search filters
 #set($categoryFilter = "category = :category")
@@ -27,6 +33,8 @@
 #set($minHeightFilter = "#if(!$minHeight.empty)and height >= :minHeight#end")
 #set($minDepthFilter = "#if(!$minDepth.empty)and #depth >= :minDepth#end")
 #set($isSharedFilter = "#if(!$isShared.empty)and isShared = :isShared#end")
+#set($fromDateFilter = "#if(!$fromDate.empty)and availability.#from <= :fromDate#end")
+#set($toDateFilter = "#if(!$toDate.empty)and availability.#to >= :toDate#end")
 
 {
 
@@ -35,7 +43,7 @@
 
     "KeyConditionExpression": "$categoryFilter $maxRentFilter",
 
-    "FilterExpression": "locationId = :locationId $minWidthFilter $minHeightFilter $minDepthFilter $isSharedFilter",
+    "FilterExpression": "locationId = :locationId $minWidthFilter $minHeightFilter $minDepthFilter $isSharedFilter $fromDateFilter $toDateFilter",
 
     "ExpressionAttributeValues": {
 
@@ -73,14 +81,23 @@
         }
         #end
 
+        ,":fromDate": {
+            "S": "$fromDate"
+        }
+        ,":toDate": {
+            "S": "$toDate"
+        }
+
     },
 
     ## This mapping is required since 'depth' is a reserved keyword
-    #if(!$minDepth.empty)
     "ExpressionAttributeNames": {
-        "#depth": "depth"
+        #if(!$minDepth.empty)
+            "#depth": "depth",
+        #end
+        "#to": "to",
+        "#from": "from"
     },
-    #end
 
     "Limit": 1000
 

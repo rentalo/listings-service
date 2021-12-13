@@ -18,5 +18,10 @@
     "photos": #if(!$root.photos)[]#{else}$root.photos.SS#end,
     "email": "$root.email.S",
     "phone": "$root.phone.S",
-    "owner": "$root.owner.S"
+    "owner": "$root.owner.S",
+    "description": "$root.description.S",
+    "availability": {
+        "from": $root.availability.M.from.S,
+        "to": $root.availability.M.to.S
+    }
 }

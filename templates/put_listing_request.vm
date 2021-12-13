@@ -15,10 +15,14 @@
 #set($phone = $util.escapeJavaScript($input.path('$.phone')))
 #set($email = $util.escapeJavaScript($input.path('$.email')))
 #set($photos = $input.path('$.photos'))
+#set($description = $util.escapeJavaScript($input.path('$.description')))
+#set($fromDate = $util.escapeJavaScript($input.path('$.availability.from')))
+#set($toDate = $util.escapeJavaScript($input.path('$.availability.to')))
 
 ## Set default values
 #set($phone = "#if($phone.empty)$context.authorizer.claims.phone_number#{else}$phone#end")
 #set($email = "#if($email.empty)$context.authorizer.claims.email#{else}$email#end")
+#set($toDate = "#if($toDate.empty)9999-99-99#{else}$toDate#end")
 
 {
     "TableName": "ListingsTable",
@@ -78,6 +82,19 @@
         },
         "email": {
             "S": "$email"
+        },
+        "description": {
+            "S": "$description"
+        },
+        "availability": {
+            "M": {
+                "from": {
+                    "S": "$fromDate"
+                },
+                "to": {
+                    "S": "$toDate"
+                }
+            }
         }
     },
 
