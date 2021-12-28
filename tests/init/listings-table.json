@@ -1,0 +1,57 @@
+{
+  "TableName": "ListingsTable",
+  "AttributeDefinitions": [
+    {
+      "AttributeName": "locationId",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "listingId",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "category",
+      "AttributeType": "S"
+    },
+    {
+      "AttributeName": "rent",
+      "AttributeType": "N"
+    }
+  ],
+  "KeySchema": [
+    {
+      "AttributeName": "locationId",
+      "KeyType": "HASH"
+    },
+    {
+      "AttributeName": "listingId",
+      "KeyType": "RANGE"
+    }
+  ],
+  "GlobalSecondaryIndexes": [
+    {
+      "IndexName": "ListingCategoryIndex",
+      "KeySchema": [
+        {
+          "AttributeName": "category",
+          "KeyType": "HASH"
+        },
+        {
+          "AttributeName": "rent",
+          "KeyType": "RANGE"
+        }
+      ],
+      "Projection": {
+        "ProjectionType": "ALL"
+      },
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 1,
+        "WriteCapacityUnits": 1
+      }
+    }
+  ],
+  "ProvisionedThroughput": {
+    "ReadCapacityUnits": 1,
+    "WriteCapacityUnits": 1
+  }
+}

@@ -371,7 +371,7 @@ class ListingsServiceStack(cdk.Stack):
                     ),
                     "category": apigateway.JsonSchema(
                         type=apigateway.JsonSchemaType.STRING,
-                        enum=["BOX", "CELLAR"]
+                        enum=["BOX", "CELLAR", "OTHER"]
                     ),
                     "rent": apigateway.JsonSchema(
                         type=apigateway.JsonSchemaType.NUMBER,
@@ -513,8 +513,7 @@ class ListingsServiceStack(cdk.Stack):
             method_responses=[
                 apigateway.MethodResponse(status_code="200"),
                 apigateway.MethodResponse(status_code="400")
-            ],
-            authorizer=listings_api_authorizer
+            ]
         )
 
         v1_listing_geohash_id.add_method(

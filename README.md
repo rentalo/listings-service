@@ -3,6 +3,7 @@
 ### Open endpoints
 
 - [Get listings (public)](#get-listings-public) - `GET /public/v1/listings/{geohash}`
+- [Get a listing photo](#get-a-listing-photo) - `GET /v1/listing/photo/{hash}`
 
 ### Authenticated endpoints
 
@@ -11,7 +12,6 @@
 - [Get listing details](#get-listing-details) - `GET /v1/listing/{geohash}/{id}`
 - [Delete a listing](#delete-a-listing) - `DELETE /v1/listing/{geohash}/{id}`
 - [Publish a listing photo](#publish-a-listing-photo) - `PUT /v1/listing/photo`
-- [Get a listing photo](#get-a-listing-photo) - `GET /v1/listing/photo/{hash}`
 
 ### Endpoints details
 
@@ -152,3 +152,33 @@ Uri: `/v1/listing/photo/{hash}`
 Method: `GET`
 
 Description: `Get a listing photo by its hash`
+
+
+### Testing
+
+#### Requirements
+
+- `localstack`
+- `awslocal`
+- `api-gateway-mapping-template`
+
+#### Setup
+
+1. Run localstack
+
+    ```
+    export USE_SINGLE_REGION=true; localstack start -d
+    ```
+
+2. Initialize resources
+
+    ```
+    awslocal dynamodb create-table --cli-input-json file://tests/init/listings-table.json
+    awslocal s3 mb s3://listings-photos-bucket
+    ```
+
+#### Run
+
+```
+python -m unittest discover tests/
+```

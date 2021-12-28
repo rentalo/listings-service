@@ -23,18 +23,19 @@
 ## Set default values
 #set($category = "#if($category.empty)BOX#{else}$category#end")
 #set($maxRent = "#if($maxRent.empty)9999#{else}$maxRent#end")
-#set($toDate = "#if($toDate.empty)9999-99-99#{else}$toDate#end")
-#set($fromDate = "#if($fromDate.empty)0000-00-00#{else}$fromDate#end")
+#set($minWidth = "#if($minWidth.empty)0#{else}$minWidth#end")
+#set($minHeight = "#if($minHeight.empty)0#{else}$minHeight#end")
+#set($minDepth = "#if($minDepth.empty)0#{else}$minDepth#end")
 
 ## Search filters
 #set($categoryFilter = "category = :category")
 #set($maxRentFilter = "and rent <= :maxRent")
-#set($minWidthFilter = "#if(!$minWidth.empty)and width >= :minWidth#end")
-#set($minHeightFilter = "#if(!$minHeight.empty)and height >= :minHeight#end")
-#set($minDepthFilter = "#if(!$minDepth.empty)and #depth >= :minDepth#end")
-#set($isSharedFilter = "#if(!$isShared.empty)and isShared = :isShared#end")
-#set($fromDateFilter = "#if(!$fromDate.empty)and availability.#from <= :fromDate#end")
-#set($toDateFilter = "#if(!$toDate.empty)and availability.#to >= :toDate#end")
+#set($minWidthFilter = "and (width >= :minWidth or #depth >= :minWidth)")
+#set($minHeightFilter = "and height >= :minHeight")
+#set($minDepthFilter = "and (#depth >= :minDepth or width >= :minDepth)")
+#set($isSharedFilter = "#if($isShared)and isShared = :isShared#end")
+#set($fromDateFilter = "#if($fromDate)and availability.#from <= :fromDate#end")
+#set($toDateFilter = "#if($toDate)and availability.#to >= :toDate#end")
 
 {
 
@@ -81,22 +82,28 @@
         }
         #end
 
+        #if($fromDate)
         ,":fromDate": {
             "S": "$fromDate"
         }
+        #end
+        #if($toDate)
         ,":toDate": {
             "S": "$toDate"
         }
+        #end
 
     },
 
-    ## This mapping is required since 'depth' is a reserved keyword
+    ## This mapping is required since 'depth', 'to', and 'from' are reserved keywords
     "ExpressionAttributeNames": {
-        #if(!$minDepth.empty)
-            "#depth": "depth",
+        "#depth": "depth"
+        #if($toDate)
+        ,"#to": "to"
         #end
-        "#to": "to",
-        "#from": "from"
+        #if($fromDate)
+        ,"#from": "from"
+        #end
     },
 
     "Limit": 1000
