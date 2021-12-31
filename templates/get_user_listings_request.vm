@@ -1,0 +1,33 @@
+## Input values
+#set($owner = $context.authorizer.claims.sub)
+
+## Search filters
+#set($ownerFilter = "#owner = :owner")
+#set($maxRentFilter = "and rent <= :maxRent")
+
+{
+
+    "TableName": "ListingsTable",
+    "IndexName": "ListingOwnerIndex",
+
+    "KeyConditionExpression": "$ownerFilter $maxRentFilter",
+
+    "ExpressionAttributeValues": {
+
+        ":owner": {
+            "S": "$owner"
+        },
+        ":maxRent": {
+            "N": "9999"
+        }
+
+    },
+
+    ## This mapping is required since 'owner' is a reserved keyword
+    "ExpressionAttributeNames": {
+        "#owner": "owner"
+    },
+
+    "Limit": 50
+
+}

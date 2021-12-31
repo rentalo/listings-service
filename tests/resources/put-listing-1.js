@@ -5,7 +5,13 @@ const payload = JSON.stringify({
     id: '14572623-886b-47ba-9b23-13fb150fccdd',
     category: 'BOX',
     rent: '50',
-    address: 'Via Venezia 42, Napoli, NA, 12345, Italia',
+    address: {
+        street: 'Via Roma 123',
+        city: 'Torino',
+        state: 'TO',
+        zip: '12345',
+        country: 'Italy',
+    },
     position: {
         latitude: '45.0',
         longitude: '8.0'

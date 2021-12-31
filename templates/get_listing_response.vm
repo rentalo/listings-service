@@ -5,7 +5,13 @@
     "locationId": "$root.locationId.S",
     "category": "$root.category.S",
     "rent": $root.rent.N,
-    "address": "$root.address.S",
+    "address": {
+        "street": "$root.address.M.street.S",
+        "city": "$root.address.M.city.S",
+        "state": "$root.address.M.state.S",
+        "zip": "$root.address.M.zip.S",
+        "country": "$root.address.M.country.S"
+    },
     "position": {
         "latitude": $root.position.M.latitude.N,
         "longitude": $root.position.M.longitude.N
@@ -21,7 +27,7 @@
     "owner": "$root.owner.S",
     "description": "$root.description.S",
     "availability": {
-        "from": $root.availability.M.from.S,
-        "to": $root.availability.M.to.S
+        "from": "$root.availability.M.from.S",
+        "to": "$root.availability.M.to.S"
     }
 }

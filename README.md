@@ -12,6 +12,7 @@
 - [Get listing details](#get-listing-details) - `GET /v1/listing/{geohash}/{id}`
 - [Delete a listing](#delete-a-listing) - `DELETE /v1/listing/{geohash}/{id}`
 - [Publish a listing photo](#publish-a-listing-photo) - `PUT /v1/listing/photo`
+- [Get user listings](#get-user-listings) - `GET /v1/user/listings`
 
 ### Endpoints details
 
@@ -63,7 +64,13 @@ Sample body:
   "geohash": "gbsvh",
   "category": "BOX",
   "rent": 40,
-  "address": "Via Roma 42, Genova, GE, 12345, Italia",
+  "address": {
+     "street": "Via Roma 123",
+     "city": "Torino",
+     "state": "TO",
+     "zip": "12345",
+     "country": "Italy"
+  },
   "position": {
     "latitude": 45.076035, 
     "longitude": 7.669416
@@ -94,11 +101,17 @@ Sample response:
 ```json
 {
 
-  "id": "4c343850-13b3-41e1-974c-aaaa2c387444",
-  "geohash": "gbsvh",
+  "listingId": "4c343850-13b3-41e1-974c-aaaa2c387444",
+  "locationId": "gbsvh",
   "category": "BOX",
   "rent": 40,
-  "address": "Via Roma 42, Genova, GE, 12345, Italia",
+  "address": {
+     "street": "Via Roma 123",
+     "city": "Torino",
+     "state": "TO",
+     "zip": "12345",
+     "country": "Italy"
+  },
   "position": {
     "latitude": 45.076035, 
     "longitude": 7.669416
@@ -152,6 +165,14 @@ Uri: `/v1/listing/photo/{hash}`
 Method: `GET`
 
 Description: `Get a listing photo by its hash`
+
+#### Get user listings
+
+Uri: `/v1/user/listings`
+
+Method: `GET`
+
+Description: `Get all listings created by the authenticated user`
 
 
 ### Testing

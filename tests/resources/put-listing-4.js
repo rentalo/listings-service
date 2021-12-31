@@ -5,7 +5,13 @@ const payload = JSON.stringify({
     id: 'd60541ec-64da-4888-ac90-bbe6cb500682',
     category: 'CELLAR',
     rent: '60',
-    address: 'Piazza Rivoli 123, Genova, GE, 12345, Italia',
+    address: {
+        street: 'Via Roma 123',
+        city: 'Torino',
+        state: 'TO',
+        zip: '12345',
+        country: 'Italy',
+    },
     position: {
         latitude: '46.0',
         longitude: '7.0'

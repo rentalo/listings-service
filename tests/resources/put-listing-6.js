@@ -2,8 +2,8 @@ const convert = require('./convert.js');
 
 const payload = JSON.stringify({
     geohash: '9q8yv0',
-    id: '83fa260d-15e7-4e71-9053-6d287cdc30d8',
-    category: 'CELLAR',
+    id: '3a83bd23-b1ec-40f8-a727-8b1393ddf41b',
+    category: 'BOX',
     rent: '60',
     address: {
         street: 'Via Roma 123',
@@ -34,7 +34,7 @@ const params = {};
 const context = {
     authorizer: {
         claims: {
-            sub: 'af93332f-ce76-41de-979e-9151c5518456',
+            sub: 'b989e224-6c93-48f3-80b2-fa5ee5f6db81',
             phone_number: '+393476543210',
             email: 'user@example.com'
         }

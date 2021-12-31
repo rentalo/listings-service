@@ -16,6 +16,10 @@
     {
       "AttributeName": "rent",
       "AttributeType": "N"
+    },
+    {
+      "AttributeName": "owner",
+      "AttributeType": "S"
     }
   ],
   "KeySchema": [
@@ -34,6 +38,26 @@
       "KeySchema": [
         {
           "AttributeName": "category",
+          "KeyType": "HASH"
+        },
+        {
+          "AttributeName": "rent",
+          "KeyType": "RANGE"
+        }
+      ],
+      "Projection": {
+        "ProjectionType": "ALL"
+      },
+      "ProvisionedThroughput": {
+        "ReadCapacityUnits": 1,
+        "WriteCapacityUnits": 1
+      }
+    },
+    {
+      "IndexName": "ListingOwnerIndex",
+      "KeySchema": [
+        {
+          "AttributeName": "owner",
           "KeyType": "HASH"
         },
         {

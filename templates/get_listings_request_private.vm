@@ -58,25 +58,25 @@
             "N": "$maxRent"
         }
 
-        #if(!$minWidth.empty)
+        #if($minWidth)
         ,":minWidth": {
             "N": "$minWidth"
         }
         #end
 
-        #if(!$minHeight.empty)
+        #if($minHeight)
         ,":minHeight": {
             "N": "$minHeight"
         }
         #end
 
-        #if(!$minDepth.empty)
+        #if($minDepth)
         ,":minDepth": {
             "N": "$minDepth"
         }
         #end
 
-        #if(!$isShared.empty)
+        #if($isShared)
         ,":isShared": {
             "BOOL": "$isShared"
         }

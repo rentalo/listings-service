@@ -30,6 +30,12 @@ class ListingsServiceStack(cdk.Stack):
             sort_key=dynamodb.Attribute(name="rent", type=dynamodb.AttributeType.NUMBER),
             projection_type=dynamodb.ProjectionType.ALL
         )
+        listings_table.add_global_secondary_index(
+            index_name="ListingsOwnerIndex",
+            partition_key=dynamodb.Attribute(name="owner", type=dynamodb.AttributeType.STRING),
+            sort_key=dynamodb.Attribute(name="rent", type=dynamodb.AttributeType.NUMBER),
+            projection_type=dynamodb.ProjectionType.ALL
+        )
 
         # BUCKET--------------------------------------------------------------------------------------------------------
 
@@ -295,6 +301,31 @@ class ListingsServiceStack(cdk.Stack):
             )
         )
 
+        # Get user listings integration
+        with open("templates/get_user_listings_request.vm") as request_template, \
+                open("templates/get_listings_response.vm") as response_template:
+            get_user_listings_integration = apigateway.AwsIntegration(
+                service="dynamodb",
+                action="Query",
+                options=apigateway.IntegrationOptions(
+                    passthrough_behavior=apigateway.PassthroughBehavior.NEVER,
+                    credentials_role=dynamodb_integration_role,
+                    request_parameters={},
+                    request_templates={"application/json": request_template.read()},
+                    integration_responses=[
+                        apigateway.IntegrationResponse(
+                            status_code="200",
+                            response_templates={"application/json": response_template.read()}
+                        ),
+                        apigateway.IntegrationResponse(
+                            status_code="400",
+                            selection_pattern="^4[0-9][0-9]$",
+                            response_templates={"application/json": "{}"}
+                        )
+                    ]
+                )
+            )
+
         # AUTHORIZATION-------------------------------------------------------------------------------------------------
 
         publishers_user_pool = cognito.UserPool.from_user_pool_arn(
@@ -315,6 +346,8 @@ class ListingsServiceStack(cdk.Stack):
         public_v1_listings = public_v1.add_resource(path_part="listings")                                               # /public/v1/listings
         public_v1_listings_geohash = public_v1_listings.add_resource(path_part="{geohash}")                             # /public/v1/listings/{geohash}
         v1 = listings_api.root.add_resource(path_part="v1")                                                             # /v1
+        v1_user = v1.add_resource(path_part="user")                                                                     # /v1/user
+        v1_user_listings = v1_user.add_resource(path_part="listings")                                                   # /v1/user/listings
         v1_listings = v1.add_resource(path_part="listings")                                                             # /v1/listings
         v1_listings_geohash = v1_listings.add_resource(path_part="{geohash}")                                           # /v1/listings/{geohash}
         v1_listing = v1.add_resource(path_part="listing")                                                               # /v1/listing
@@ -378,8 +411,33 @@ class ListingsServiceStack(cdk.Stack):
                         minimum=0, maximum=9999
                     ),
                     "address": apigateway.JsonSchema(
-                        type=apigateway.JsonSchemaType.STRING,                                                          # Match only this format:
-                        pattern="^[a-zA-Z'\\s]+[\\d]+([/][A-Z]+)?, [a-zA-Z]+, [A-Z]{2}, [0-9]{5}, [a-zA-Z]+$"           # Via Roma 123, Torino, TO, 12345, Italy
+                        type=apigateway.JsonSchemaType.OBJECT,
+                        required=["street", "city", "state", "zip", "country"],
+                        properties={
+                            "street": apigateway.JsonSchema(
+                                type=apigateway.JsonSchemaType.STRING,
+                                max_length=128,
+                                pattern="^[a-zA-Z'\\s]+[\\d]*([/][0-9]+[A-Z]?)?$"
+                            ),
+                            "city": apigateway.JsonSchema(
+                                type=apigateway.JsonSchemaType.STRING,
+                                max_length=64,
+                                pattern="^[a-zA-Z]+$"
+                            ),
+                            "state": apigateway.JsonSchema(
+                                type=apigateway.JsonSchemaType.STRING,
+                                pattern="^[A-Z]{2}$"
+                            ),
+                            "zip": apigateway.JsonSchema(
+                                type=apigateway.JsonSchemaType.STRING,
+                                pattern="^[0-9]{5}$"
+                            ),
+                            "country": apigateway.JsonSchema(
+                                type=apigateway.JsonSchemaType.STRING,
+                                max_length=64,
+                                pattern="^[a-zA-Z]+$"
+                            )
+                        }
                     ),
                     "position": apigateway.JsonSchema(
                         type=apigateway.JsonSchemaType.OBJECT,
@@ -554,4 +612,15 @@ class ListingsServiceStack(cdk.Stack):
                 apigateway.MethodResponse(status_code="200"),
                 apigateway.MethodResponse(status_code="400")
             ]
+        )
+
+        v1_user_listings.add_method(
+            http_method="GET",
+            integration=get_user_listings_integration,
+            request_parameters={},
+            method_responses=[
+                apigateway.MethodResponse(status_code="200"),
+                apigateway.MethodResponse(status_code="400")
+            ],
+            authorizer=listings_api_authorizer
         )

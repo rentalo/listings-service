@@ -3,7 +3,11 @@
 #set($listingId = $util.escapeJavaScript($input.path('$.id')))
 #set($category = $util.escapeJavaScript($input.path('$.category')))
 #set($rent = $util.escapeJavaScript($input.path('$.rent')))
-#set($address = $util.escapeJavaScript($input.path('$.address')))
+#set($street = $util.escapeJavaScript($input.path('$.address.street')))
+#set($city = $util.escapeJavaScript($input.path('$.address.city')))
+#set($state = $util.escapeJavaScript($input.path('$.address.state')))
+#set($zip = $util.escapeJavaScript($input.path('$.address.zip')))
+#set($country = $util.escapeJavaScript($input.path('$.address.country')))
 #set($latitude = $util.escapeJavaScript($input.path('$.position.latitude')))
 #set($longitude = $util.escapeJavaScript($input.path('$.position.longitude')))
 #set($width = $util.escapeJavaScript($input.path('$.width')))
@@ -40,7 +44,23 @@
             "N": "$rent"
         },
         "address": {
-            "S": "$address"
+            "M": {
+                "street": {
+                    "S": "$street"
+                },
+                "city": {
+                    "S": "$city"
+                },
+                "state": {
+                    "S": "$state"
+                },
+                "zip": {
+                    "S": "$zip"
+                },
+                "country": {
+                    "S": "$country"
+                }
+            }
         },
         "position": {
             "M": {
