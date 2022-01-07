@@ -41,7 +41,8 @@ class ListingsServiceStack(cdk.Stack):
 
         listings_photos_bucket = s3.Bucket(
             self, "ListingsPhotosBucket",
-            removal_policy=cdk.RemovalPolicy.DESTROY
+            removal_policy=cdk.RemovalPolicy.DESTROY,
+            versioned=True
         )
 
         # API-----------------------------------------------------------------------------------------------------------
@@ -369,13 +370,11 @@ class ListingsServiceStack(cdk.Stack):
                 properties={
                     "hash": apigateway.JsonSchema(
                         type=apigateway.JsonSchemaType.STRING,
-                        pattern="^[A-Za-z0-9\\+\\/]{22}==$",
                         description="Base64 encoded hash of base64 encoded image"
                     ),
                     "base64": apigateway.JsonSchema(
                         type=apigateway.JsonSchemaType.STRING,
                         max_length=1_048_576,
-                        pattern="^[A-Za-z0-9\\+\\/]+[=]{1,2}$",
                         description="Base64 encoded image"
                     )
                 }
@@ -472,7 +471,6 @@ class ListingsServiceStack(cdk.Stack):
                         min_length=1,
                         items=apigateway.JsonSchema(
                             type=apigateway.JsonSchemaType.STRING,
-                            pattern="^[A-Za-z0-9\\+\\/]{22}==$"                                                         # Match only base64 encoded hashes
                         )
                     ),
                     "phone": apigateway.JsonSchema(

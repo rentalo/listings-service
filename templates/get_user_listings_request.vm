@@ -8,7 +8,7 @@
 {
 
     "TableName": "ListingsTable",
-    "IndexName": "ListingOwnerIndex",
+    "IndexName": "ListingsOwnerIndex",
 
     "KeyConditionExpression": "$ownerFilter $maxRentFilter",
 

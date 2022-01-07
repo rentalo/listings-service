@@ -33,7 +33,7 @@
 #set($minWidthFilter = "and (width >= :minWidth or #depth >= :minWidth)")
 #set($minHeightFilter = "and height >= :minHeight")
 #set($minDepthFilter = "and (#depth >= :minDepth or width >= :minDepth)")
-#set($isSharedFilter = "#if($isShared)and isShared = :isShared#end")
+#set($isSharedFilter = "#if(!$isShared.empty)and isShared = :isShared#end")
 #set($fromDateFilter = "#if($fromDate)and availability.#from <= :fromDate#end")
 #set($toDateFilter = "#if($toDate)and availability.#to >= :toDate#end")
 
@@ -76,7 +76,7 @@
         }
         #end
 
-        #if($isShared)
+        #if(!$isShared.empty)
         ,":isShared": {
             "BOOL": "$isShared"
         }

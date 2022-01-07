@@ -54,7 +54,7 @@
       }
     },
     {
-      "IndexName": "ListingOwnerIndex",
+      "IndexName": "ListingsOwnerIndex",
       "KeySchema": [
         {
           "AttributeName": "owner",
