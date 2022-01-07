@@ -34,8 +34,8 @@
 #set($minHeightFilter = "and height >= :minHeight")
 #set($minDepthFilter = "and (#depth >= :minDepth or width >= :minDepth)")
 #set($isSharedFilter = "#if(!$isShared.empty)and isShared = :isShared#end")
-#set($fromDateFilter = "#if($fromDate)and availability.#from <= :fromDate#end")
-#set($toDateFilter = "#if($toDate)and availability.#to >= :toDate#end")
+#set($fromDateFilter = "#if(!$fromDate.empty)and availability.#from <= :fromDate#end")
+#set($toDateFilter = "#if(!$toDate.empty)and availability.#to >= :toDate#end")
 
 {
 
@@ -82,12 +82,12 @@
         }
         #end
 
-        #if($fromDate)
+        #if(!$fromDate.empty)
         ,":fromDate": {
             "S": "$fromDate"
         }
         #end
-        #if($toDate)
+        #if(!$toDate.empty)
         ,":toDate": {
             "S": "$toDate"
         }
@@ -98,10 +98,10 @@
     ## This mapping is required since 'depth', 'to', and 'from' are reserved keywords
     "ExpressionAttributeNames": {
         "#depth": "depth"
-        #if($toDate)
+        #if(!$toDate.empty)
         ,"#to": "to"
         #end
-        #if($fromDate)
+        #if(!$fromDate.empty)
         ,"#from": "from"
         #end
     },

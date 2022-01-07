@@ -282,6 +282,7 @@ class ListingsServiceStack(cdk.Stack):
                         response_templates={"application/json": "{}"},
                         response_parameters={
                             "method.response.header.id": "integration.response.header.x-amz-version-id",
+                            "method.response.header.Access-Control-Expose-Headers": "'id'",
                             "method.response.header.Access-Control-Allow-Origin": "'*'",
                             "method.response.header.Access-Control-Allow-Credentials": "'true'",
                             "method.response.header.Access-Control-Allow-Headers": "'*'"
@@ -588,6 +589,7 @@ class ListingsServiceStack(cdk.Stack):
                     status_code="200",
                     response_parameters={
                         "method.response.header.id": True,
+                        "method.response.header.Access-Control-Expose-Headers": True,
                         "method.response.header.Access-Control-Allow-Origin": True,
                         "method.response.header.Access-Control-Allow-Credentials": True,
                         "method.response.header.Access-Control-Allow-Headers": True
