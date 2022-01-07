@@ -105,6 +105,12 @@ class ListingsServiceStack(cdk.Stack):
 
         # INTEGRATIONS--------------------------------------------------------------------------------------------------
 
+        integration_response_parameters_cors = {
+            "method.response.header.Access-Control-Allow-Origin": "'*'",
+            "method.response.header.Access-Control-Allow-Credentials": "'true'",
+            "method.response.header.Access-Control-Allow-Headers": "'*'"
+        }
+
         # Query listings integration (private)
         with open("templates/get_listings_request_private.vm") as request_template, \
              open("templates/get_listings_response.vm") as response_template:
@@ -129,12 +135,14 @@ class ListingsServiceStack(cdk.Stack):
                     integration_responses=[
                         apigateway.IntegrationResponse(
                             status_code="200",
-                            response_templates={"application/json": response_template.read()}
+                            response_templates={"application/json": response_template.read()},
+                            response_parameters=integration_response_parameters_cors
                         ),
                         apigateway.IntegrationResponse(
                             status_code="400",
                             selection_pattern="^4[0-9][0-9]$",
-                            response_templates={"application/json": "{}"}
+                            response_templates={"application/json": "{}"},
+                            response_parameters=integration_response_parameters_cors
                         )
                     ]
                 )
@@ -156,12 +164,14 @@ class ListingsServiceStack(cdk.Stack):
                     integration_responses=[
                         apigateway.IntegrationResponse(
                             status_code="200",
-                            response_templates={"application/json": response_template.read()}
+                            response_templates={"application/json": response_template.read()},
+                            response_parameters=integration_response_parameters_cors
                         ),
                         apigateway.IntegrationResponse(
                             status_code="400",
                             selection_pattern="^4[0-9][0-9]$",
-                            response_templates={"application/json": "{}"}
+                            response_templates={"application/json": "{}"},
+                            response_parameters=integration_response_parameters_cors
                         )
                     ]
                 )
@@ -179,12 +189,14 @@ class ListingsServiceStack(cdk.Stack):
                     integration_responses=[
                         apigateway.IntegrationResponse(
                             status_code="200",
-                            response_templates={"application/json": "{}"}
+                            response_templates={"application/json": "{}"},
+                            response_parameters=integration_response_parameters_cors
                         ),
                         apigateway.IntegrationResponse(
                             status_code="400",
                             selection_pattern="^4[0-9][0-9]$",
-                            response_templates={"application/json": "{}"}
+                            response_templates={"application/json": "{}"},
+                            response_parameters=integration_response_parameters_cors
                         )
                     ]
                 )
@@ -207,12 +219,14 @@ class ListingsServiceStack(cdk.Stack):
                     integration_responses=[
                         apigateway.IntegrationResponse(
                             status_code="200",
-                            response_templates={"application/json": response_template.read()}
+                            response_templates={"application/json": response_template.read()},
+                            response_parameters=integration_response_parameters_cors
                         ),
                         apigateway.IntegrationResponse(
                             status_code="400",
                             selection_pattern="^4[0-9][0-9]$",
-                            response_templates={"application/json": "{}"}
+                            response_templates={"application/json": "{}"},
+                            response_parameters=integration_response_parameters_cors
                         )
                     ]
                 )
@@ -234,12 +248,14 @@ class ListingsServiceStack(cdk.Stack):
                     integration_responses=[
                         apigateway.IntegrationResponse(
                             status_code="200",
-                            response_templates={"application/json": "{}"}
+                            response_templates={"application/json": "{}"},
+                            response_parameters=integration_response_parameters_cors
                         ),
                         apigateway.IntegrationResponse(
                             status_code="400",
                             selection_pattern="^4[0-9][0-9]$",
-                            response_templates={"application/json": "{}"}
+                            response_templates={"application/json": "{}"},
+                            response_parameters=integration_response_parameters_cors
                         )
                     ]
                 )
@@ -265,13 +281,17 @@ class ListingsServiceStack(cdk.Stack):
                         selection_pattern="200",
                         response_templates={"application/json": "{}"},
                         response_parameters={
-                            "method.response.header.id": "integration.response.header.x-amz-version-id"
+                            "method.response.header.id": "integration.response.header.x-amz-version-id",
+                            "method.response.header.Access-Control-Allow-Origin": "'*'",
+                            "method.response.header.Access-Control-Allow-Credentials": "'true'",
+                            "method.response.header.Access-Control-Allow-Headers": "'*'"
                         }
                     ),
                     apigateway.IntegrationResponse(
                         status_code="400",
                         selection_pattern="^4[0-9][0-9]$",
-                        response_templates={"application/json": "{}"}
+                        response_templates={"application/json": "{}"},
+                        response_parameters=integration_response_parameters_cors
                     )
                 ]
             )
@@ -292,12 +312,14 @@ class ListingsServiceStack(cdk.Stack):
                     apigateway.IntegrationResponse(
                         status_code="200",
                         selection_pattern="200",
+                        response_parameters=integration_response_parameters_cors,
                         content_handling=apigateway.ContentHandling.CONVERT_TO_BINARY                                   # Convert stored base64 image to binary
                     ),
                     apigateway.IntegrationResponse(
                         status_code="400",
                         selection_pattern="^4[0-9][0-9]$",
-                        response_templates={"application/json": "{}"}
+                        response_templates={"application/json": "{}"},
+                        response_parameters=integration_response_parameters_cors
                     )
                 ]
             )
@@ -305,7 +327,7 @@ class ListingsServiceStack(cdk.Stack):
 
         # Get user listings integration
         with open("templates/get_user_listings_request.vm") as request_template, \
-                open("templates/get_listings_response.vm") as response_template:
+             open("templates/get_listings_response.vm") as response_template:
             get_user_listings_integration = apigateway.AwsIntegration(
                 service="dynamodb",
                 action="Query",
@@ -317,12 +339,14 @@ class ListingsServiceStack(cdk.Stack):
                     integration_responses=[
                         apigateway.IntegrationResponse(
                             status_code="200",
-                            response_templates={"application/json": response_template.read()}
+                            response_templates={"application/json": response_template.read()},
+                            response_parameters=integration_response_parameters_cors
                         ),
                         apigateway.IntegrationResponse(
                             status_code="400",
                             selection_pattern="^4[0-9][0-9]$",
-                            response_templates={"application/json": "{}"}
+                            response_templates={"application/json": "{}"},
+                            response_parameters=integration_response_parameters_cors
                         )
                     ]
                 )
@@ -498,6 +522,12 @@ class ListingsServiceStack(cdk.Stack):
 
         # METHODS-------------------------------------------------------------------------------------------------------
 
+        method_response_parameters_cors = {
+            "method.response.header.Access-Control-Allow-Origin": True,
+            "method.response.header.Access-Control-Allow-Credentials": True,
+            "method.response.header.Access-Control-Allow-Headers": True
+        }
+
         v1_listings_geohash.add_method(
             http_method="GET",
             integration=private_query_integration,
@@ -513,8 +543,14 @@ class ListingsServiceStack(cdk.Stack):
                 "method.request.querystring.to_date": False
             },
             method_responses=[
-                apigateway.MethodResponse(status_code="200"),
-                apigateway.MethodResponse(status_code="400")
+                apigateway.MethodResponse(
+                    status_code="200",
+                    response_parameters=method_response_parameters_cors
+                ),
+                apigateway.MethodResponse(
+                    status_code="400",
+                    response_parameters=method_response_parameters_cors
+                )
             ],
             authorizer=listings_api_authorizer
         )
@@ -523,8 +559,14 @@ class ListingsServiceStack(cdk.Stack):
             http_method="PUT",
             integration=put_listing_integration,
             method_responses=[
-                apigateway.MethodResponse(status_code="200"),
-                apigateway.MethodResponse(status_code="400")
+                apigateway.MethodResponse(
+                    status_code="200",
+                    response_parameters=method_response_parameters_cors
+                ),
+                apigateway.MethodResponse(
+                    status_code="400",
+                    response_parameters=method_response_parameters_cors
+                )
             ],
             request_validator=apigateway.RequestValidator(
                 self, "PutListingRequestValidator",
@@ -545,10 +587,16 @@ class ListingsServiceStack(cdk.Stack):
                 apigateway.MethodResponse(
                     status_code="200",
                     response_parameters={
-                        "method.response.header.id": True
+                        "method.response.header.id": True,
+                        "method.response.header.Access-Control-Allow-Origin": True,
+                        "method.response.header.Access-Control-Allow-Credentials": True,
+                        "method.response.header.Access-Control-Allow-Headers": True
                     }
                 ),
-                apigateway.MethodResponse(status_code="400")
+                apigateway.MethodResponse(
+                    status_code="400",
+                    response_parameters=method_response_parameters_cors
+                )
             ],
             request_validator=apigateway.RequestValidator(
                 self, "PutListingPhotoRequestValidator",
@@ -569,8 +617,14 @@ class ListingsServiceStack(cdk.Stack):
                 "method.request.path.id": True
             },
             method_responses=[
-                apigateway.MethodResponse(status_code="200"),
-                apigateway.MethodResponse(status_code="400")
+                apigateway.MethodResponse(
+                    status_code="200",
+                    response_parameters=method_response_parameters_cors
+                ),
+                apigateway.MethodResponse(
+                    status_code="400",
+                    response_parameters=method_response_parameters_cors
+                )
             ]
         )
 
@@ -582,8 +636,14 @@ class ListingsServiceStack(cdk.Stack):
                 "method.request.path.id": True
             },
             method_responses=[
-                apigateway.MethodResponse(status_code="200"),
-                apigateway.MethodResponse(status_code="400")
+                apigateway.MethodResponse(
+                    status_code="200",
+                    response_parameters=method_response_parameters_cors
+                ),
+                apigateway.MethodResponse(
+                    status_code="400",
+                    response_parameters=method_response_parameters_cors
+                )
             ],
             authorizer=listings_api_authorizer
         )
@@ -596,8 +656,14 @@ class ListingsServiceStack(cdk.Stack):
                 "method.request.path.id": True
             },
             method_responses=[
-                apigateway.MethodResponse(status_code="200"),
-                apigateway.MethodResponse(status_code="400")
+                apigateway.MethodResponse(
+                    status_code="200",
+                    response_parameters=method_response_parameters_cors
+                ),
+                apigateway.MethodResponse(
+                    status_code="400",
+                    response_parameters=method_response_parameters_cors
+                )
             ],
             authorizer=listings_api_authorizer
         )
@@ -609,8 +675,14 @@ class ListingsServiceStack(cdk.Stack):
                 "method.request.path.geohash": True
             },
             method_responses=[
-                apigateway.MethodResponse(status_code="200"),
-                apigateway.MethodResponse(status_code="400")
+                apigateway.MethodResponse(
+                    status_code="200",
+                    response_parameters=method_response_parameters_cors
+                ),
+                apigateway.MethodResponse(
+                    status_code="400",
+                    response_parameters=method_response_parameters_cors
+                )
             ]
         )
 
@@ -619,8 +691,14 @@ class ListingsServiceStack(cdk.Stack):
             integration=get_user_listings_integration,
             request_parameters={},
             method_responses=[
-                apigateway.MethodResponse(status_code="200"),
-                apigateway.MethodResponse(status_code="400")
+                apigateway.MethodResponse(
+                    status_code="200",
+                    response_parameters=method_response_parameters_cors
+                ),
+                apigateway.MethodResponse(
+                    status_code="400",
+                    response_parameters=method_response_parameters_cors
+                )
             ],
             authorizer=listings_api_authorizer
         )
