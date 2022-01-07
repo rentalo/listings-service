@@ -249,14 +249,12 @@ class ListingsServiceStack(cdk.Stack):
         put_listing_photo_integration = apigateway.AwsIntegration(
             service="s3",
             integration_http_method="PUT",
-            path="{}/{{hash}}".format(listings_photos_bucket.bucket_name),
+            path="{}/thumbnail".format(listings_photos_bucket.bucket_name),
             options=apigateway.IntegrationOptions(
                 passthrough_behavior=apigateway.PassthroughBehavior.NEVER,
                 credentials_role=s3_integration_role,
                 request_parameters={
-                    "integration.request.path.hash": "method.request.body.hash",
-                    "integration.request.header.Content-Type": "'image/jpeg+base64'",                                   # Objects are base64 encoded images
-                    "integration.request.header.Content-MD5": "method.request.body.hash"                                # Enforce integrity: object name must match object hash
+                    "integration.request.header.Content-Type": "'image/jpeg+base64'"                                    # Objects are base64 encoded images
                 },
                 request_templates={
                     "application/json": "$input.path('$.base64')"                                                       # Store base64 encoded image
@@ -265,7 +263,10 @@ class ListingsServiceStack(cdk.Stack):
                     apigateway.IntegrationResponse(
                         status_code="200",
                         selection_pattern="200",
-                        response_templates={"application/json": "{}"}
+                        response_templates={"application/json": "{}"},
+                        response_parameters={
+                            "method.response.header.id": "integration.response.header.x-amz-version-id"
+                        }
                     ),
                     apigateway.IntegrationResponse(
                         status_code="400",
@@ -280,11 +281,11 @@ class ListingsServiceStack(cdk.Stack):
         get_listing_photo_integration = apigateway.AwsIntegration(
             service="s3",
             integration_http_method="GET",
-            path="{}/{{hash}}".format(listings_photos_bucket.bucket_name),
+            path="{}/thumbnail?versionId={{version}}".format(listings_photos_bucket.bucket_name),
             options=apigateway.IntegrationOptions(
                 credentials_role=s3_integration_role,
                 request_parameters={
-                    "integration.request.path.hash": "method.request.path.hash",
+                    "integration.request.path.version": "method.request.path.id",
                     "integration.request.header.Accept": "'image/jpeg'"
                 },
                 integration_responses=[
@@ -336,7 +337,7 @@ class ListingsServiceStack(cdk.Stack):
         listings_api_authorizer = apigateway.CognitoUserPoolsAuthorizer(
             self, "ListingsApiAuthorizer",
             authorizer_name="ListingsApiAuthorizer",
-            identity_source="method.request.header.Authorization",                                                      # Authorization must be passed on this header
+            identity_source="method.request.header.Authorization",  # Authorization must be passed on this header
             cognito_user_pools=[publishers_user_pool]
         )
 
@@ -353,7 +354,7 @@ class ListingsServiceStack(cdk.Stack):
         v1_listings_geohash = v1_listings.add_resource(path_part="{geohash}")                                           # /v1/listings/{geohash}
         v1_listing = v1.add_resource(path_part="listing")                                                               # /v1/listing
         v1_listing_photo = v1_listing.add_resource(path_part="photo")                                                   # /v1/listing/photo
-        v1_listing_photo_hash = v1_listing_photo.add_resource(path_part="{hash}")                                       # /v1/listing/photo/{hash}
+        v1_listing_photo_id = v1_listing_photo.add_resource(path_part="{id}")                                           # /v1/listing/photo/{id}
         v1_listing_geohash = v1_listing.add_resource(path_part="{geohash}")                                             # /v1/listing/{geohash}
         v1_listing_geohash_id = v1_listing_geohash.add_resource(path_part="{id}")                                       # /v1/listing/{geohash}/{id}
 
@@ -366,12 +367,8 @@ class ListingsServiceStack(cdk.Stack):
             content_type="application/json",
             schema=apigateway.JsonSchema(
                 type=apigateway.JsonSchemaType.OBJECT,
-                required=["hash", "base64"],
+                required=["base64"],
                 properties={
-                    "hash": apigateway.JsonSchema(
-                        type=apigateway.JsonSchemaType.STRING,
-                        description="Base64 encoded hash of base64 encoded image"
-                    ),
                     "base64": apigateway.JsonSchema(
                         type=apigateway.JsonSchemaType.STRING,
                         max_length=1_048_576,
@@ -545,7 +542,12 @@ class ListingsServiceStack(cdk.Stack):
             http_method="PUT",
             integration=put_listing_photo_integration,
             method_responses=[
-                apigateway.MethodResponse(status_code="200"),
+                apigateway.MethodResponse(
+                    status_code="200",
+                    response_parameters={
+                        "method.response.header.id": True
+                    }
+                ),
                 apigateway.MethodResponse(status_code="400")
             ],
             request_validator=apigateway.RequestValidator(
@@ -560,11 +562,11 @@ class ListingsServiceStack(cdk.Stack):
             authorizer=listings_api_authorizer
         )
 
-        v1_listing_photo_hash.add_method(
+        v1_listing_photo_id.add_method(
             http_method="GET",
             integration=get_listing_photo_integration,
             request_parameters={
-                "method.request.path.hash": True
+                "method.request.path.id": True
             },
             method_responses=[
                 apigateway.MethodResponse(status_code="200"),
